@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .box {
+    position: relative;
+    width: 385px;
+    height: 400px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .box::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 380px;
+    height: 400px;
+    background: linear-gradient(
+      0deg,
+      transparent,
+      transparent,
+      #00eeff,
+      #00eeff,
+      #00eeff
+    );
+    z-index: 1;
+    transform-origin: bottom-right;
+    animation: rotateGradient 6s linear infinite;
+  }
+}
