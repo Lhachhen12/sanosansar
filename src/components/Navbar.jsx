@@ -1,156 +1,179 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeContext";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const [isOpen, setIsOpen] = useState(false);
-
-  const showToast = (type, message) => {
-    Swal.fire({
-      toast: true,
-      position: "top-end",
-      icon: type,
-      title: message,
-      showConfirmButton: false,
-      timer: 3000,
-      timerProgressBar: true,
-    });
-  };
+  const isDark = theme === "dark";
 
   const handleLogout = () => {
     logout();
-    showToast("success", "Logout successful!");
+    setIsOpen(false);
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: "success",
+      title: "Logout successful!",
+      showConfirmButton: false,
+      timer: 2000,
+      timerProgressBar: true,
+      background: isDark ? "#1F2937" : "#FFFFFF",
+      color: isDark ? "#F3F4F6" : "#1F2937",
+      customClass: { popup: "mt-16" },
+    });
   };
 
+  const NavLink = ({ to, children, onClick }) => (
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`px-4 py-2 rounded-md text-sm transition-colors duration-200 ${
+        isDark
+          ? "text-gray-100 hover:bg-gray-700"
+          : "text-white hover:bg-blue-700"
+      }`}
+    >
+      {children}
+    </Link>
+  );
+
+  const NavButton = ({ onClick, children }) => (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 rounded-md text-sm transition-colors duration-200 ${
+        isDark
+          ? "text-gray-100 hover:bg-gray-700"
+          : "text-white hover:bg-blue-700"
+      }`}
+    >
+      {children}
+    </button>
+  );
+
   return (
-    <nav className="bg-blue-600 text-white">
+    <nav
+      className={`fixed top-0 w-full z-50 ${
+        isDark ? "bg-gray-800" : "bg-blue-600"
+      } shadow-lg`}
+    >
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <Link to="/" className="font-bold text-xl">
-              Sano_Sansaar
-            </Link>
-          </div>
-
-          {/* Hamburger Icon */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md hover:bg-blue-700 focus:outline-none"
-            >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
+          <Link
+            to="/"
+            className="font-bold text-xl text-white hover:opacity-90 transition-opacity"
+          >
+            Sano_Sansaar
+          </Link>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex md:items-center">
+          <div className="hidden md:flex md:items-center md:space-x-2">
             {user ? (
               <>
-                <Link to="/" className="px-3 py-2 rounded-md hover:bg-blue-700">
+                <NavLink to="/" onClick={() => setIsOpen(false)}>
                   Home
-                </Link>
-                <Link
-                  to="/profile"
-                  className="px-3 py-2 rounded-md hover:bg-blue-700"
-                >
+                </NavLink>
+                <NavLink to="/profile" onClick={() => setIsOpen(false)}>
                   Profile
-                </Link>
-                <Link
-                  to="/test"
-                  className="px-3 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Test
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="px-3 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Logout
-                </button>
+                </NavLink>
+                <NavButton onClick={toggleTheme}>
+                  {isDark ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
+                </NavButton>
+                <NavButton onClick={handleLogout}>Logout</NavButton>
               </>
             ) : (
-              <Link
-                to="/login"
-                className="px-3 py-2 rounded-md hover:bg-blue-700"
-              >
-                Login
-              </Link>
+              <>
+                <NavLink to="/login" onClick={() => setIsOpen(false)}>
+                  Login
+                </NavLink>
+                <NavButton onClick={toggleTheme}>
+                  {isDark ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
+                </NavButton>
+              </>
             )}
+          </div>
+
+          {/* Mobile Menu Icons */}
+          <div className="flex md:hidden items-center space-x-4">
+            <button
+              onClick={() => {
+                toggleTheme();
+              }}
+              className="p-2 rounded-md text-white hover:bg-blue-700 transition-colors"
+            >
+              {isDark ? (
+                <Sun className="w-6 h-6" />
+              ) : (
+                <Moon className="w-6 h-6" />
+              )}
+            </button>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 rounded-md text-white hover:bg-blue-700 transition-colors"
+            >
+              {isOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden">
-            <div className="bg-blue-600 space-y-1 px-4 pt-2 pb-4">
-              {user ? (
-                <>
-                  <Link
-                    to="/"
-                    className="block px-3 py-2 rounded-md hover:bg-blue-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    to="/profile"
-                    className="block px-3 py-2 rounded-md hover:bg-blue-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/test"
-                    className="block px-3 py-2 rounded-md hover:bg-blue-700"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Test
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-md hover:bg-blue-700"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="block px-3 py-2 rounded-md hover:bg-blue-700"
-                  onClick={() => setIsOpen(false)}
+          <div
+            className={`md:hidden absolute left-0 right-0 pt-2 pb-3 px-4 space-y-1 shadow-lg ${
+              isDark ? "bg-gray-800" : "bg-blue-600"
+            }`}
+          >
+            {user ? (
+              <>
+                <NavLink to="/" onClick={() => setIsOpen(false)}>
+                  Home
+                </NavLink>
+                <NavLink to="/profile" onClick={() => setIsOpen(false)}>
+                  Profile
+                </NavLink>
+                <NavButton
+                  onClick={() => {
+                    toggleTheme();
+                    setIsOpen(false);
+                  }}
                 >
+                  {isDark ? "Light Mode" : "Dark Mode"}
+                </NavButton>
+                <NavButton onClick={handleLogout}>Logout</NavButton>
+              </>
+            ) : (
+              <>
+                <NavLink to="/login" onClick={() => setIsOpen(false)}>
                   Login
-                </Link>
-              )}
-            </div>
+                </NavLink>
+                <NavButton
+                  onClick={() => {
+                    toggleTheme();
+                    setIsOpen(false);
+                  }}
+                >
+                  {isDark ? "Light Mode" : "Dark Mode"}
+                </NavButton>
+              </>
+            )}
           </div>
         )}
       </div>

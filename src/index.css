@@ -31,3 +31,13 @@
     animation: rotateGradient 6s linear infinite;
   }
 }
+/* index.css */
+body.dark {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #000000;
+}
